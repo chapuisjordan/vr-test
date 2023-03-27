@@ -1,0 +1,35 @@
+service: vr-test
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    DYNAMODB_ACCESS_KEY_ID: ""
+    DYNAMODB_SECRET_ACCESS_KEY: ""
+    DYNAMODB_TABLE_NAME: "games"
+    DYNAMODB_REGION: "us-east-1"
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: games
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  game:
+    handler: src/lambda/index.onGameFinished
+    events:
+      - httpApi:
+          path: /
+          method: post
+
